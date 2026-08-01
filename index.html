@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Model Inference Interface</title>
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Google Font: Space Grotesk (headings) + Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+/* ============================================================
+   AI Model Inference Interface — Stylesheet
+   Design language: glassmorphism cards floating over an
+   animated blue-purple gradient with soft "neural" ambience.
+   ============================================================ */
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* Palette */
+  --bg-deep-1: #0b1130;
+  --bg-deep-2: #1a1146;
+  --bg-deep-3: #2a1454;
+  --accent-blue: #5b8dff;
+  --accent-violet: #9b6bff;
+  --accent-cyan: #57e6d8;
+  --text-primary: #f4f6ff;
+  --text-secondary: #b7c0e8;
+  --text-muted: #8b93bd;
+
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg-strong: rgba(255, 255, 255, 0.09);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 20px 60px rgba(8, 8, 30, 0.55);
+
+  /* Type */
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Radii */
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: radial-gradient(circle at 15% 15%, var(--bg-deep-3), transparent 55%),
+    radial-gradient(circle at 85% 20%, var(--bg-deep-2), transparent 50%),
+    linear-gradient(160deg, var(--bg-deep-1), #120b30 60%, #1a0f3d);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ---------- Ambient background: floating orbs + grid ---------- */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.55;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.orb-one {
+  width: 480px;
+  height: 480px;
+  top: -120px;
+  left: -120px;
+  background: radial-gradient(circle, var(--accent-blue), transparent 70%);
+  animation: drift-one 18s ease-in-out infinite;
+}
+
+.orb-two {
+  width: 420px;
+  height: 420px;
+  bottom: -140px;
+  right: -100px;
+  background: radial-gradient(circle, var(--accent-violet), transparent 70%);
+  animation: drift-two 22s ease-in-out infinite;
+}
+
+.orb-three {
+  width: 300px;
+  height: 300px;
+  top: 40%;
+  left: 60%;
+  background: radial-gradient(circle, var(--accent-cyan), transparent 70%);
+  opacity: 0.25;
+  animation: drift-three 26s ease-in-out infinite;
+}
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at 50% 30%, black, transparent 75%);
+}
+
+@keyframes drift-one {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, 40px) scale(1.08); }
+}
+
+@keyframes drift-two {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-50px, -30px) scale(1.1); }
+}
+
+@keyframes drift-three {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-40px, 30px); }
+}
+
+/* ---------- Page layout ---------- */
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- Header ---------- */
+.app-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--accent-cyan);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  margin: 0 0 10px;
+  background: linear-gradient(100deg, #ffffff 10%, var(--accent-blue) 55%, var(--accent-violet) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.01em;
+}
+
+.app-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* ---------- Glass card ---------- */
+.glass-card {
+  width: 100%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 34px;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ---------- Field group / labels ---------- */
+.field-group {
+  margin-bottom: 26px;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.field-label i {
+  color: var(--accent-blue);
+}
+
+/* ---------- Custom select ---------- */
+.select-wrapper {
+  position: relative;
+}
+
+.model-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 500;
+  padding: 14px 44px 14px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.model-select:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.model-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(91, 141, 255, 0.25);
+}
+
+.model-select option {
+  background: #1a1240;
+  color: var(--text-primary);
+}
+
+.select-caret {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  font-size: 0.85rem;
+}
+
+/* ---------- Input sections ---------- */
+.input-section {
+  margin-bottom: 26px;
+  animation: fadeSlideIn 0.4s ease;
+}
+
+/* ---------- Drop zone (Image Classifier) ---------- */
+.drop-zone {
+  border: 1.5px dashed rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 34px 20px;
+  text-align: center;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.drop-zone:hover {
+  border-color: var(--accent-blue);
+  background: rgba(91, 141, 255, 0.06);
+}
+
+.drop-zone.drag-over {
+  border-color: var(--accent-cyan);
+  background: rgba(87, 230, 216, 0.09);
+  transform: scale(1.01);
+}
+
+.drop-icon-circle {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+  font-size: 1.5rem;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(91, 141, 255, 0.35);
+}
+
+.drop-title {
+  margin: 0 0 4px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.drop-subtext {
+  margin: 0 0 18px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.image-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: fadeSlideIn 0.4s ease;
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 260px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--glass-border);
+}
+
+/* ---------- Text input (Text Generator) ---------- */
+.text-input {
+  width: 100%;
+  min-height: 140px;
+  resize: vertical;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  padding: 16px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.text-input::placeholder {
+  color: var(--text-muted);
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(91, 141, 255, 0.2);
+}
+
+.char-counter {
+  text-align: right;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+#charCount {
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.18s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  padding: 11px 20px;
+  font-size: 0.9rem;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-blue);
+  background: rgba(91, 141, 255, 0.12);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.btn-sm {
+  font-size: 0.82rem;
+}
+
+.action-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.btn-lg {
+  flex: 1;
+  padding: 16px 22px;
+  font-size: 1rem;
+  border-radius: var(--radius-md);
+}
+
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(120deg, var(--accent-blue), var(--accent-violet));
+  box-shadow: 0 10px 30px rgba(91, 141, 255, 0.35);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(155, 107, 255, 0.45);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--glass-border);
+  color: var(--text-secondary);
+}
+
+.btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ---------- Loading state ---------- */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px 0 10px;
+  animation: fadeSlideIn 0.4s ease;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--accent-blue);
+  border-right-color: var(--accent-violet);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.dots span {
+  animation: blink 1.4s infinite;
+  opacity: 0;
+}
+
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 20% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---------- Result card ---------- */
+.result-card {
+  margin-top: 28px;
+  padding: 24px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgba(91, 141, 255, 0.1), rgba(155, 107, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  animation: fadeSlideIn 0.5s ease;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--accent-cyan);
+  margin-bottom: 18px;
+}
+
+.result-header i {
+  font-size: 1.1rem;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.result-row:last-of-type {
+  border-bottom: none;
+}
+
+.result-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.result-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.confidence-bar-track {
+  margin-top: 14px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.confidence-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.generated-text {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--text-primary);
+  font-size: 0.98rem;
+}
+
+/* ---------- Footer ---------- */
+.app-footer {
+  margin-top: 30px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+/* ---------- Utility ---------- */
+.hidden {
+  display: none !important;
+}
+
+.fade-in {
+  animation: fadeSlideIn 0.6s ease both;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .page {
+    padding: 40px 16px 32px;
+  }
+
+  .glass-card {
+    padding: 24px 18px;
+  }
+
+  .action-row {
+    flex-direction: column;
+  }
+
+  .drop-zone {
+    padding: 26px 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .app-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+</style>
+</head>
+<body>
+
+  <!-- Decorative animated background blobs (purely visual, sit behind everything) -->
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+  <div class="bg-orb orb-three"></div>
+  <div class="bg-grid"></div>
+
+  <main class="page">
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="app-header fade-in">
+      <div class="header-badge">
+        <i class="fa-solid fa-microchip"></i>
+        <span>Inference Sandbox</span>
+      </div>
+      <h1 class="app-title">AI Model Inference Interface</h1>
+      <p class="app-subtitle">Upload data or enter text to interact with an AI model.</p>
+    </header>
+
+    <!-- ===================== MAIN CARD ===================== -->
+    <section class="panel glass-card fade-in delay-1">
+
+      <!-- ---------- Model selector ---------- -->
+      <div class="field-group">
+        <label for="modelType" class="field-label">
+          <i class="fa-solid fa-layer-group"></i> Choose model type
+        </label>
+        <div class="select-wrapper">
+          <select id="modelType" class="model-select">
+            <option value="image">Image Classifier</option>
+            <option value="text">Text Generator</option>
+          </select>
+          <i class="fa-solid fa-chevron-down select-caret"></i>
+        </div>
+      </div>
+
+      <!-- ---------- IMAGE CLASSIFIER INPUT ---------- -->
+      <div id="imageSection" class="input-section">
+
+        <div id="dropZone" class="drop-zone">
+          <input type="file" id="fileInput" accept="image/*" hidden />
+
+          <!-- Empty state: shown before an image is chosen -->
+          <div id="dropZoneEmpty" class="drop-zone-empty">
+            <div class="drop-icon-circle">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <p class="drop-title">Drag &amp; drop an image here</p>
+            <p class="drop-subtext">PNG, JPG or WEBP &mdash; up to 10MB</p>
+            <button type="button" id="browseBtn" class="btn btn-secondary">
+              <i class="fa-solid fa-folder-open"></i> Browse File
+            </button>
+          </div>
+
+          <!-- Preview state: shown after an image is chosen -->
+          <div id="imagePreviewWrap" class="image-preview-wrap hidden">
+            <img id="imagePreview" class="image-preview" src="" alt="Uploaded preview" />
+            <button type="button" id="changeImageBtn" class="btn btn-ghost btn-sm">
+              <i class="fa-solid fa-rotate"></i> Change image
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- TEXT GENERATOR INPUT ---------- -->
+      <div id="textSection" class="input-section hidden">
+        <label for="textInput" class="field-label">
+          <i class="fa-solid fa-keyboard"></i> Enter a prompt
+        </label>
+        <textarea
+          id="textInput"
+          class="text-input"
+          rows="6"
+          maxlength="500"
+          placeholder="e.g. Write a short paragraph about how artificial intelligence is changing everyday life..."
+        ></textarea>
+        <div class="char-counter">
+          <span id="charCount">0</span> / 500 characters
+        </div>
+      </div>
+
+      <!-- ---------- ACTION BUTTONS ---------- -->
+      <div class="action-row">
+        <button type="button" id="predictBtn" class="btn btn-primary btn-lg">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span id="predictBtnLabel">Predict</span>
+        </button>
+        <button type="button" id="resetBtn" class="btn btn-outline btn-lg">
+          <i class="fa-solid fa-rotate-left"></i> Reset
+        </button>
+      </div>
+
+      <!-- ---------- LOADING STATE ---------- -->
+      <div id="loadingState" class="loading-state hidden">
+        <div class="spinner"></div>
+        <p class="loading-text">Running inference<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+      </div>
+
+      <!-- ---------- RESULT CARD ---------- -->
+      <div id="resultCard" class="result-card hidden">
+        <div class="result-header">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Inference Complete</span>
+        </div>
+
+        <!-- Image result layout -->
+        <div id="imageResult" class="result-body hidden">
+          <div class="result-row">
+            <span class="result-label">Prediction</span>
+            <span id="predictionValue" class="result-value">&mdash;</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Confidence</span>
+            <span id="confidenceValue" class="result-value">&mdash;</span>
+          </div>
+          <div class="confidence-bar-track">
+            <div id="confidenceBarFill" class="confidence-bar-fill"></div>
+          </div>
+        </div>
+
+        <!-- Text result layout -->
+        <div id="textResult" class="result-body hidden">
+          <p id="generatedText" class="generated-text"></p>
+        </div>
+      </div>
+
+    </section>
+
+    <footer class="app-footer fade-in delay-2">
+      <p>Frontend simulation only &mdash; no data leaves your browser.</p>
+    </footer>
+
+  </main>
+
+  <script>
+/* ============================================================
+   AI Model Inference Interface — script.js
+   All "AI" behaviour here is simulated on the frontend only.
+   No network calls, no backend, no real model.
+   ============================================================ */
+
+// ---------- Grab references to all the DOM elements we need ----------
+const modelTypeSelect = document.getElementById("modelType");
+
+const imageSection = document.getElementById("imageSection");
+const textSection = document.getElementById("textSection");
+
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
+const browseBtn = document.getElementById("browseBtn");
+const dropZoneEmpty = document.getElementById("dropZoneEmpty");
+const imagePreviewWrap = document.getElementById("imagePreviewWrap");
+const imagePreview = document.getElementById("imagePreview");
+const changeImageBtn = document.getElementById("changeImageBtn");
+
+const textInput = document.getElementById("textInput");
+const charCount = document.getElementById("charCount");
+
+const predictBtn = document.getElementById("predictBtn");
+const predictBtnLabel = document.getElementById("predictBtnLabel");
+const resetBtn = document.getElementById("resetBtn");
+
+const loadingState = document.getElementById("loadingState");
+
+const resultCard = document.getElementById("resultCard");
+const imageResult = document.getElementById("imageResult");
+const textResult = document.getElementById("textResult");
+const predictionValue = document.getElementById("predictionValue");
+const confidenceValue = document.getElementById("confidenceValue");
+const confidenceBarFill = document.getElementById("confidenceBarFill");
+const generatedText = document.getElementById("generatedText");
+
+// Keeps track of whichever image file the user has uploaded (if any)
+let uploadedImageDataUrl = null;
+
+// ============================================================
+// 1. MODEL TYPE SWITCHING
+// ============================================================
+// Show the right input section depending on the dropdown value,
+// and update the button label to match ("Predict" vs "Generate").
+function updateModelTypeView() {
+  const isImageMode = modelTypeSelect.value === "image";
+
+  imageSection.classList.toggle("hidden", !isImageMode);
+  textSection.classList.toggle("hidden", isImageMode);
+
+  predictBtnLabel.textContent = isImageMode ? "Predict" : "Generate";
+
+  // Switching modes clears any previous result so old output
+  // doesn't linger under a mismatched input type.
+  hideResult();
+}
+
+modelTypeSelect.addEventListener("change", updateModelTypeView);
+
+// ============================================================
+// 2. IMAGE UPLOAD (drag & drop + browse button)
+// ============================================================
+
+// Clicking the drop zone (or the Browse File button) opens the file picker
+browseBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  fileInput.click();
+});
+
+dropZone.addEventListener("click", () => {
+  // Only trigger the file picker if we're still in the "empty" state
+  if (!imagePreviewWrap.classList.contains("hidden")) return;
+  fileInput.click();
+});
+
+// Standard file input change
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) handleImageFile(file);
+});
+
+// Drag & drop events
+["dragenter", "dragover"].forEach((eventName) => {
+  dropZone.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropZone.classList.add("drag-over");
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  dropZone.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropZone.classList.remove("drag-over");
+  });
+});
+
+dropZone.addEventListener("drop", (e) => {
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith("image/")) {
+    handleImageFile(file);
+  }
+});
+
+// Reads the chosen image file and shows a live preview
+function handleImageFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    uploadedImageDataUrl = e.target.result;
+    imagePreview.src = uploadedImageDataUrl;
+
+    dropZoneEmpty.classList.add("hidden");
+    imagePreviewWrap.classList.remove("hidden");
+  };
+  reader.readAsDataURL(file);
+}
+
+// "Change image" button lets the user pick a different file
+changeImageBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  fileInput.click();
+});
+
+// ============================================================
+// 3. TEXT INPUT + CHARACTER COUNTER
+// ============================================================
+textInput.addEventListener("input", () => {
+  charCount.textContent = textInput.value.length;
+});
+
+// ============================================================
+// 4. PREDICT / GENERATE BUTTON
+// ============================================================
+predictBtn.addEventListener("click", () => {
+  const isImageMode = modelTypeSelect.value === "image";
+
+  // Basic validation so the demo behaves sensibly
+  if (isImageMode && !uploadedImageDataUrl) {
+    alert("Please upload an image first.");
+    return;
+  }
+  if (!isImageMode && textInput.value.trim().length === 0) {
+    alert("Please enter some text first.");
+    return;
+  }
+
+  runFakeInference(isImageMode);
+});
+
+// Simulates calling an AI model: shows a spinner for a couple of
+// seconds, then reveals a randomly-picked fake result.
+function runFakeInference(isImageMode) {
+  hideResult();
+  setControlsDisabled(true);
+  loadingState.classList.remove("hidden");
+
+  // Random delay between 2 and 3 seconds to feel like real inference
+  const delay = 2000 + Math.random() * 1000;
+
+  setTimeout(() => {
+    loadingState.classList.add("hidden");
+    setControlsDisabled(false);
+
+    if (isImageMode) {
+      showImageResult();
+    } else {
+      showTextResult();
+    }
+  }, delay);
+}
+
+function setControlsDisabled(isDisabled) {
+  predictBtn.disabled = isDisabled;
+  resetBtn.disabled = isDisabled;
+}
+
+// ============================================================
+// 5. FAKE RESULT GENERATORS
+// ============================================================
+
+// A small bank of plausible image-classification labels
+const IMAGE_LABELS = [
+  { label: "Cat", icon: "🐱" },
+  { label: "Dog", icon: "🐶" },
+  { label: "Golden Retriever", icon: "🐕" },
+  { label: "Coffee Mug", icon: "☕" },
+  { label: "Mountain Landscape", icon: "🏔️" },
+  { label: "Sports Car", icon: "🚗" },
+  { label: "Laptop", icon: "💻" },
+];
+
+// A small bank of AI-flavoured generated paragraphs
+const TEXT_SAMPLES = [
+  "Artificial Intelligence is transforming modern technology by enabling machines to learn from data, recognize patterns, and make decisions with minimal human intervention. From healthcare to finance, AI-driven systems are streamlining workflows and unlocking insights that were previously out of reach.",
+  "Machine learning models thrive on large, well-structured datasets. As more organizations invest in data infrastructure, the quality and speed of AI predictions continue to improve, opening the door to smarter automation across nearly every industry.",
+  "Natural language processing has advanced rapidly in recent years, allowing systems to understand context, tone, and intent with impressive accuracy. This progress is powering everything from chatbots to real-time translation tools.",
+  "The future of AI lies in collaboration between humans and machines. Rather than replacing human judgment, well-designed AI systems are built to augment decision-making, freeing people to focus on creativity and strategy.",
+];
+
+function showImageResult() {
+  const pick = IMAGE_LABELS[Math.floor(Math.random() * IMAGE_LABELS.length)];
+  const confidence = (90 + Math.random() * 9.9).toFixed(1); // e.g. "98.4"
+
+  predictionValue.textContent = `${pick.icon} ${pick.label}`;
+  confidenceValue.textContent = `${confidence}%`;
+
+  imageResult.classList.remove("hidden");
+  textResult.classList.add("hidden");
+  resultCard.classList.remove("hidden");
+
+  // Animate the confidence bar filling up on the next paint frame
+  confidenceBarFill.style.width = "0%";
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      confidenceBarFill.style.width = `${confidence}%`;
+    });
+  });
+}
+
+function showTextResult() {
+  const pick = TEXT_SAMPLES[Math.floor(Math.random() * TEXT_SAMPLES.length)];
+  generatedText.textContent = pick;
+
+  textResult.classList.remove("hidden");
+  imageResult.classList.add("hidden");
+  resultCard.classList.remove("hidden");
+}
+
+function hideResult() {
+  resultCard.classList.add("hidden");
+  confidenceBarFill.style.width = "0%";
+}
+
+// ============================================================
+// 6. RESET BUTTON
+// ============================================================
+resetBtn.addEventListener("click", () => {
+  // Reset image upload state
+  uploadedImageDataUrl = null;
+  fileInput.value = "";
+  imagePreview.src = "";
+  dropZoneEmpty.classList.remove("hidden");
+  imagePreviewWrap.classList.add("hidden");
+
+  // Reset text input state
+  textInput.value = "";
+  charCount.textContent = "0";
+
+  // Reset result + loading UI
+  loadingState.classList.add("hidden");
+  hideResult();
+  setControlsDisabled(false);
+});
+
+// ============================================================
+// 7. INITIALIZE
+// ============================================================
+updateModelTypeView();
+
+</script>
+</body>
+</html>
