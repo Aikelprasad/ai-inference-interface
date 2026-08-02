@@ -1,16 +1,69 @@
-name: Auto Deploy to Vercel
+name: Continuous Integration & Vercel Deployment
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy:
-    name: Trigger Vercel Deploy Hook
+  # =========================================================
+  # JOB 1: Code Quality, Testing, & Docker Validation
+  # =========================================================
+  build-and-test:
+    name: Verify Code & Build Docker Image
     runs-on: ubuntu-latest
+
     steps:
-      - name: Trigger Vercel Deploy
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm' 
+
+      - name: Validate HTML Structure
+        run: |
+          echo "Checking if main HTML file exists..."
+          test -f aiinterface.html || (echo "ERROR: aiinterface.html not found!" && exit 1)
+          echo "HTML file successfully verified."
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test Docker Image Build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false # We only build to verify the Dockerfile works cleanly
+          tags: ai-inference-interface:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # =========================================================
+  # JOB 2: Trigger Vercel Web Deployment
+  # =========================================================
+  deploy-to-vercel:
+    name: Trigger Clean Vercel Deployment
+    needs: build-and-test # Only runs if the validation & Docker build succeed
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Trigger Vercel Deploy Hook
         env:
           BUILD_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
-        run: curl -X POST -d {} $BUILD_HOOK
+        run: |
+          echo "Sending POST request to Vercel Deploy Hook..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d {} "$BUILD_HOOK")
+          
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "Successfully triggered Vercel deployment! HTTP Status: $HTTP_STATUS"
+          else
+            echo "Failed to trigger deployment. HTTP Status: $HTTP_STATUS"
+            exit 1
+          fi
