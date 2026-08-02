@@ -27,7 +27,7 @@ jobs:
       - name: Validate HTML Structure
         run: |
           echo "Checking if main HTML file exists..."
-          test -f aiinterface.html || (echo "ERROR: aiinterface.html not found!" && exit 1)
+          test -f index.html || (echo "ERROR: index.html not found!" && exit 1)
           echo "HTML file successfully verified."
 
       - name: Set up Docker Buildx
