@@ -1,0 +1,16 @@
+name: Auto Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Trigger Vercel Deploy Hook
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deploy
+        env:
+          BUILD_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: curl -X POST -d {} $BUILD_HOOK
