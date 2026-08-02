@@ -23,9 +23,7 @@ jobs:
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm' 
-
+          node-version: '20' 
       - name: Validate HTML Structure
         run: |
           echo "Checking if main HTML file exists..."
@@ -45,7 +43,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   # =========================================================
-  # JOB 2: Trigger Vercel Web Deployment
+  # JOB 2: Trigger Vercel Web Deployment 
   # =========================================================
   deploy-to-vercel:
     name: Trigger Clean Vercel Deployment
